@@ -1,0 +1,6 @@
+@BigO.API_HostAddress = http://localhost:5241
+
+GET {{BigO.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
