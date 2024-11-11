@@ -18,8 +18,9 @@ namespace BigO.Services.Analysis
 			{ @"//.*", TokenType.Comment },
 			{@"\s+", TokenType.Whitespace},
 
-			{@"^\(\(", TokenType.StartOfFile},
-			{@"\)\)$", TokenType.EndOfFile},
+			//{@"^\(\(", TokenType.StartOfFile},
+			//{@"\)\)$", TokenType.EndOfFile},
+
 
 			{@"[a-zA-Z_][a-zA-Z0-9_]*", TokenType.Identifier},
 			{@"\d+(\.\d+)?", TokenType.Number},
@@ -94,7 +95,8 @@ namespace BigO.Services.Analysis
 			var response = new LexicalResponseDTO
 			{
 				Tokens = new List<Token>(),
-				Succeeded = true
+				Succeeded = true,
+				Errors = new List<Error>()
 			};
 
 			try
@@ -103,6 +105,8 @@ namespace BigO.Services.Analysis
 				{
 					return InvalidResponse("Code is required");
 				}
+
+				sourceCode.Code = sourceCode.Code.Trim();
 
 				if (!Regex.IsMatch(sourceCode.Code, @"^\(\(") || !Regex.IsMatch(sourceCode.Code, @"\)\)$"))
 				{
@@ -126,14 +130,36 @@ namespace BigO.Services.Analysis
 							response.Tokens.Add(token);
 							if (!token.IsValid)
 							{
+								//response.Succeeded = false;
+								//response.ErrorMessage = $"Invalid token '{token.Value}' at line {token.Line}";
+								////response.TotalTokens = response.Tokens.Count(t => !t.IsIgnored);
+								////return response;
+
+								//return InvalidResponse($"Invalid token '{token.Value}' at line {token.Line}");
+
+								response.Errors.Add(new Error
+								{
+									//Token = token.Value,
+									Message = $"Invalid token '{token.Value}'",
+									Line = token.Line,
+									Position = position
+								});
 								response.Succeeded = false;
-								response.ErrorMessage = $"Invalid token '{token.Value}' at line {token.Line}";
-								// aquí podría retornar
 							}
 						}
 					}
 					currentPosition += line.Length + 1; // +1 por el \n
 					lineNumber++;
+				}
+
+				if (!response.Succeeded)
+				{
+					return new LexicalResponseDTO
+					{
+						Succeeded = false,
+						Errors = response.Errors,
+						TotalErrors = response.Errors.Count
+					};
 				}
 
 				// SOF y EOF
@@ -235,14 +261,23 @@ namespace BigO.Services.Analysis
 			return type == TokenType.Whitespace || type == TokenType.Comment;
 		}
 
-		private LexicalResponseDTO InvalidResponse(string errorMessage)
+		private LexicalResponseDTO InvalidResponse(string errorMessage, string token = "", int lineNum = -1, int pos = -1)
 		{
 			return new LexicalResponseDTO
 			{
 				Succeeded = false,
 				Tokens = new List<Token>(),
 				TotalTokens = -1,
-				ErrorMessage = errorMessage
+				Errors = new List<Error>
+				{
+					new Error
+					{
+						//Token = token,
+						Message = errorMessage,
+						Line = lineNum,
+						Position = pos
+					}
+				}
 			};
 		}
 	}

@@ -12,7 +12,8 @@ namespace BigO.Core.DTOs
 		public bool Succeeded { get; set; }
 		public int TotalTokens { get; set; }
 		public List<Token> Tokens { get; set; }
-		public string ErrorMessage { get; set; }
+		public int TotalErrors { get; set; }
+		public List<Error> Errors { get; set; }
 
 	}
 }
