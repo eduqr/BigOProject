@@ -1,14 +1,10 @@
-﻿using BigO.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BigO.Core.DTOs;
+using BigO.Core.Models;
 
 namespace BigO.Core.Interfaces
 {
 	public interface ILexicalAnalyzer
 	{
-		Task<List<Token>> Analyze(string sourceCode);
+		Task<LexicalResponseDTO> Analyze(CodeRequestDTO sourceCode);
 	}
 }

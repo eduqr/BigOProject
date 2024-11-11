@@ -11,6 +11,7 @@ namespace BigO.Core.Models
 	{
 		public Guid Id { get; set; }
 		public TokenType Type { get; set; }
+		public string TypeName => Type.ToString();
 		public string Value { get; set; }
 		public int Line { get; set; }
 		public int Length { get; set; }
