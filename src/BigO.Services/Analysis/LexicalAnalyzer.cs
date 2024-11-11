@@ -108,10 +108,22 @@ namespace BigO.Services.Analysis
 
 				sourceCode.Code = sourceCode.Code.Trim();
 
-				if (!Regex.IsMatch(sourceCode.Code, @"^\(\(") || !Regex.IsMatch(sourceCode.Code, @"\)\)$"))
+				//if (!Regex.IsMatch(sourceCode.Code, @"^\(\(") || !Regex.IsMatch(sourceCode.Code, @"\)\)$"))
+				//{
+				//	return InvalidResponse("Code must start and end with '((' and '))'");
+				//}
+				if (!Regex.IsMatch(sourceCode.Code, @"^\(\("))
 				{
-					return InvalidResponse("Code must start and end with '((' and '))'");
+					response.Errors.Add(new Error
+					{
+						//Token = token.Value,
+						Message = "Code must start with '(('",
+						Line = 1,
+						Position = 1
+					});
+					response.Succeeded = false;
 				}
+
 
 				var content = sourceCode.Code.Substring(2, sourceCode.Code.Length - 4); // quitamos (())
 
@@ -150,6 +162,19 @@ namespace BigO.Services.Analysis
 					}
 					currentPosition += line.Length + 1; // +1 por el \n
 					lineNumber++;
+				}
+
+
+				if (!Regex.IsMatch(sourceCode.Code, @"\)\)$"))
+				{
+					response.Errors.Add(new Error
+					{
+						//Token = token.Value,
+						Message = "Code must end with '))'",
+						Line = sourceCode.Code.Split('\n').Length,
+						Position = sourceCode.Code.Length - 1
+					});
+					response.Succeeded = false;
 				}
 
 				if (!response.Succeeded)
